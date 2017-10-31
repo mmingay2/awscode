@@ -1,21 +1,14 @@
-install.packages("dplyr")
-install.packages("RJSONIO")
-install.packages("tidyr")
-install.packages("data.table")
-
-library(dplyr)
 library(RJSONIO)
-library(tidyr)
-library(data.table)
+
 
 #Get All Pairs
 #urla <- "https://api.kraken.com/0/public/AssetPairs"
 urlt <- "https://api.kraken.com/0/public/Time"
-pairdat <- fromJSON(urla) # returns a lis
-dnames <- grep("*\\.d", pairdat$result)
-pairs <- gsub(".d", "", names(pairdat$result[dnames]))
-pairs <- c(pairs, "XLTCZEUR", "XLTCXXBT")
-write.table(data.frame(pairs), file="/home/ec2-user/cryptodata/pairsOI.txt", col.names=F, row.names = F, quote = F, sep="\t")
+#pairdat <- fromJSON(urla) # returns a lis
+#dnames <- grep("*\\.d", pairdat$result)
+#pairs <- gsub(".d", "", names(pairdat$result[dnames]))
+#pairs <- c(pairs, "XLTCZEUR", "XLTCXXBT")
+#write.table(data.frame(pairs), file="/home/ec2-user/cryptodata/pairsOI.txt", col.names=F, row.names = F, quote = F, sep="\t")
 
 pairs <- as.vector(read.table("/home/ec2-user/cryptodata/pairsOI.txt")$V1)
 
@@ -24,6 +17,7 @@ ncycles <- 100
 for (j in 1:ncycles) {
   pmaster <- NULL
   for (i in 1:length(pairs)) {
+    tryCatch({
     urlp <- paste0("https://api.kraken.com/0/public/Ticker?pair=", pairs[i])
     bs_data <- fromJSON(urlp)
     askp <- as.numeric(bs_data$result[[pairs[i]]]$a)[1]
@@ -40,8 +34,11 @@ for (j in 1:ncycles) {
     pair <- pairs[i]
     temp <- data.frame(pair, time, wvol, price, ntrades, askp, askv, bidp, bidv)
     pmaster <- rbind(pmaster, temp)
-  }  
-  write.table(pmaster,"/home/ec2-user/cryptodata/crypto_prices_may4.txt", append = T, row.names = F, quote=F, sep="\t")
+    })
+  }
+  write.table(pmaster,"/home/ec2-user/cryptodata/crypto_prices_august8.txt", append = T, row.names = F, quote=F, sep="\t")
   print(paste0("Minutes Running:", (300*as.numeric(j))/60))
   Sys.sleep(300)
 }
+
+
