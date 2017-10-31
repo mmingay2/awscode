@@ -1,17 +1,14 @@
 library(RJSONIO)
 
+#Get Time
+
+urlt <- "https://api.kraken.com/0/public/Time"
 
 #Get All Pairs
-#urla <- "https://api.kraken.com/0/public/AssetPairs"
-urlt <- "https://api.kraken.com/0/public/Time"
-#pairdat <- fromJSON(urla) # returns a lis
-#dnames <- grep("*\\.d", pairdat$result)
-#pairs <- gsub(".d", "", names(pairdat$result[dnames]))
-#pairs <- c(pairs, "XLTCZEUR", "XLTCXXBT")
-#write.table(data.frame(pairs), file="/home/ec2-user/cryptodata/pairsOI.txt", col.names=F, row.names = F, quote = F, sep="\t")
 
 pairs <- as.vector(read.table("/home/ec2-user/cryptodata/pairsOI.txt")$V1)
 
+#Choose number of 5 minute intervals to run 
 ncycles <- 100
 
 for (j in 1:ncycles) {
@@ -38,6 +35,8 @@ for (j in 1:ncycles) {
   }
   write.table(pmaster,"/home/ec2-user/cryptodata/crypto_prices_august8.txt", append = T, row.names = F, quote=F, sep="\t")
   print(paste0("Minutes Running:", (300*as.numeric(j))/60))
+  
+  #Set Interval to 5 minutes
   Sys.sleep(300)
 }
 
